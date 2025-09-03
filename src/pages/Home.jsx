@@ -41,7 +41,8 @@ const HomePage = () => {
                 ${i === 2 ? "mx-auto" : ""}`}
                 style={{ maxWidth: i === 2 ? "300px" : "auto" }}
               >
-                <div className="text-4xl font-extrabold text-emerald-600 mb-5 flex items-center justify-center w-12 h-12 rounded-full bg-emerald-100">
+                <div className="text-4xl font-extrabold text-emerald-600 rounded-full 
+                  flex items-center justify-center w-12 h-12 bg-emerald-100 mb-5">
                   {i + 1}
                 </div>
                 <h3 className="text-2xl font-semibold mb-3">
@@ -66,67 +67,69 @@ const HomePage = () => {
 
       {/* Why Us */}
       <section className="py-12 px-6 bg-orange-50">
-  <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-    <div className="px-4 md:px-6">
-      <h2 className="text-4xl font-bold text-cyan-700 mb-6 tracking-tight flex items-center justify-center">
-        لماذا تختار المنصة اليمنية؟
-      </h2>
-      <p className="mb-6 text-gray-700 text-lg leading-relaxed flex items-center justify-center drop-shadow-sm">
-        نقدم لك بيئة احترافية وآمنة تجمع بين أصحاب المشاريع والمستقلين بكل ثقة وشفافية:
-      </p>
-      <h3 className="text-2xl font-bold text-green-700 mb-4">
-        لأصحاب المشاريع:
-      </h3>
-      <ul className="list-disc list-inside space-y-3 text-base text-gray-800">
-        <li>ضمان كامل لحقوقك في جميع التعاملات</li>
-        <li>عمولة رمزية بنسبة 10٪ فقط عند إتمام الطلب</li>
-        <li>خيارات دفع متعددة وآمنة 100٪</li>
-      </ul>
-    </div>
-    <div className="max-w-md mx-auto md:mx-0 px-4 md:px-6">
-      <img
-        src="src\assets\image\pic-1.svg"
-        alt="لماذا تختارنا"
-        className="w-full rounded-xl shadow-lg"
-        loading="lazy"
-      />
-    </div>
-  </div>
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+          <div className="px-4 md:px-6">
+            <h2 className="text-4xl font-bold text-cyan-700 mb-6 tracking-tight flex items-center justify-center">
+              لماذا تختار المنصة اليمنية؟
+            </h2>
+            <p className="mb-6 text-gray-700 text-lg leading-relaxed flex items-center justify-center drop-shadow-sm">
+              نقدم لك بيئة احترافية وآمنة تجمع بين أصحاب المشاريع والمستقلين بكل ثقة وشفافية:
+            </p>
+            <h3 className="text-2xl font-bold text-green-700 mb-4">
+              لأصحاب المشاريع:
+            </h3>
+            <ul className="list-disc list-inside space-y-3 text-base text-gray-800">
+              <li>ضمان كامل لحقوقك في جميع التعاملات</li>
+              <li>عمولة رمزية بنسبة 10٪ فقط عند إتمام الطلب</li>
+              <li>خيارات دفع متعددة وآمنة 100٪</li>
+            </ul>
+          </div>
 
-  {/* قسم المستقلين */}
-  <div className="max-w-7xl mx-auto mt-20 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-    <div className="order-2 md:order-1 max-w-md mx-auto md:mx-0 px-4 md:px-6">
-      <img
-        src="src\assets\image\new\freelancer.svg"
-        alt="فوائد للمستقلين"
-        className="w-full rounded-xl shadow-lg"
-        loading="lazy"
-      />
-    </div>
-    <div className="order-1 md:order-2 px-4 md:px-6">
-      <h3 className="text-2xl font-bold text-green-700 mb-4">
-        للمستقلين:
-      </h3>
-      <ul className="list-disc list-inside space-y-3 text-base text-gray-800">
-        <li>فرص عمل مستمرة في مختلف المجالات</li>
-        <li>واجهة سهلة لإدارة الطلبات والتواصل</li>
-        <li>سحب الأرباح بمرونة من خلال وسائل موثوقة</li>
-        <li>بناء سمعتك وتقييمك من خلال إنجازاتك</li>
-      </ul>
-    </div>
-  </div>
-</section>
+          <div className="max-w-md mx-auto md:mx-0 px-4 md:px-6">
+            <img
+              src="src\assets\image\pic-1.svg"
+              alt="لماذا تختارنا"
+              className="w-full rounded-xl shadow-lg"
+              loading="lazy"
+            />
+          </div>
+        </div>
+
+        {/* قسم المستقلين */}
+        <div className="max-w-7xl mx-auto mt-20 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+          <div className="order-2 md:order-1 max-w-md mx-auto md:mx-0 px-4 md:px-6">
+            <img
+              src="src\assets\image\new\freelancer.svg"
+              alt="فوائد للمستقلين"
+              className="w-full rounded-xl shadow-lg"
+              loading="lazy"
+            />
+          </div>
+
+          <div className="order-1 md:order-2 px-4 md:px-6">
+            <h3 className="text-2xl font-bold text-green-700 mb-4">
+              للمستقلين:
+            </h3>
+            <ul className="list-disc list-inside space-y-3 text-base text-gray-800">
+              <li>فرص عمل مستمرة في مختلف المجالات</li>
+              <li>واجهة سهلة لإدارة الطلبات والتواصل</li>
+              <li>سحب الأرباح بمرونة من خلال وسائل موثوقة</li>
+              <li>بناء سمعتك وتقييمك من خلال إنجازاتك</li>
+            </ul>
+          </div>
+        </div>
+      </section>
 
 
-      {/* Categories */}
-      <section className="py-12 px-6 bg-orange-50 text-center">
-        <h2 className="text-4xl font-bold mb-6 tracking-wide text-cyan-800">
+      {/* التصنيفات */}
+      <section className="py-12 px-4 sm:px-6 bg-orange-50 text-center">
+        <h2 className="text-3xl sm:text-4xl font-bold mb-6 tracking-wide text-cyan-800">
           الأقسام الرئيسية
         </h2>
         <p className="max-w-2xl mx-auto text-gray-700 mb-12 text-base">
           تصفّح أهم الأقسام في المنصة اليمنية واختر ما يناسب طبيعة مشروعك بكل سهولة
         </p>
-        <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 max-w-7xl mx-auto px-2">
+        <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 max-w-7xl mx-auto px-2">
           {[
             ["💼", "الأعمال"],
             ["💻", "البرمجة والتطوير"],
@@ -140,7 +143,8 @@ const HomePage = () => {
           ].map(([icon, label], i) => (
             <div
               key={i}
-              className="bg-white p-6 rounded-3xl shadow-lg hover:shadow-2xl transition transform hover:-translate-y-1 cursor-pointer h-[150px] w-[150px]"
+              className="bg-white p-4 sm:p-6 rounded-3xl shadow-lg hover:shadow-2xl transition transform 
+                hover:-translate-y-1 cursor-pointer flex flex-col items-center justify-center aspect-square"
             >
               <div className="text-4xl mb-3 text-emerald-600">{icon}</div>
               <p className="text-base font-semibold text-gray-800">{label}</p>
@@ -158,8 +162,9 @@ const HomePage = () => {
           كن جزءًا من مجتمعنا النشط وابدأ في توسيع نطاق أعمالك بثقة وأمان عبر منصتنا.
         </p>
         <Link
-          to="/signup"
-          className="inline-block bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-10 rounded-3xl transition duration-300 shadow-lg hover:shadow-xl"
+          to="/register"
+          className="inline-block bg-orange-500 hover:bg-orange-600 text-white font-bold 
+            py-4 px-10 rounded-3xl transition duration-300 shadow-lg hover:shadow-xl"
         >
           سجل الآن
         </Link>

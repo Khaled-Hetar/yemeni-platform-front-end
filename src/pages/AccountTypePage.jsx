@@ -106,13 +106,179 @@ const AccountTypePage = () => {
   };
 
   const placeholderMap = {
-    management: { job: 'مثل: مستشار إداري', skills: 'مثال: تحليل الأعمال، التخطيط' },
-    program: { job: 'مثل: مطور واجهات أمامية', skills: 'مثال: React, Laravel, API' },
-    design: { job: 'مثل: مصمم فيديو أو مهندس صوت', skills: 'مثال: Adobe Premiere, After Effects' },
-    marketing: { job: 'مثل: مدير تسويق رقمي', skills: 'مثال: SEO, Google Ads' },
-    contentIndustry: { job: 'مثل: كاتب محتوى إبداعي', skills: 'مثال: كتابة المقالات، ترجمة' },
-    training: { job: 'مثل: مدرب عن بعد', skills: 'مثال: إعداد دورات، دعم فني' },
-    other: { job: 'مثل: مقدم خدمات عامة', skills: 'مثال: خدمات متنوعة حسب الطلب' },
+    // --- الإدارة والأعمال ---
+    management: { 
+      job: 'مثل: مستشار إداري', 
+      skills: 'مثال: إدارة مشاريع، تخطيط استراتيجي، تحسين الأداء' 
+    },
+    adminSupport: { 
+      job: 'مثل: مساعد إداري افتراضي', 
+      skills: 'مثال: تنظيم جداول، إدارة بريد إلكتروني، إدخال بيانات' 
+    },
+    hr: {
+      job: 'مثل: أخصائي موارد بشرية',
+      skills: 'مثال: توظيف، تدريب، إدارة موظفين'
+    },
+    finance: {
+      job: 'مثل: مستشار مالي',
+      skills: 'مثال: استشارات استثمارية، إعداد خطط مالية'
+    },
+    accounting: { 
+      job: 'مثل: محاسب أو مدقق حسابات', 
+      skills: 'مثال: ERP, QuickBooks, Excel, تقارير مالية' 
+    },
+    legal: { 
+      job: 'مثل: مستشار قانوني', 
+      skills: 'مثال: صياغة عقود، قوانين تجارية، استشارات قانونية' 
+    },
+
+    // --- البرمجة والتكنولوجيا ---
+    program: { 
+      job: 'مثل: مطور مواقع أو تطبيقات', 
+      skills: 'مثال: React, Laravel, Node.js, API, Java, Python' 
+    },
+    mobile: {
+      job: 'مثل: مطور تطبيقات جوال',
+      skills: 'مثال: Flutter, React Native, Swift, Kotlin'
+    },
+    gameDev: {
+      job: 'مثل: مطور ألعاب',
+      skills: 'مثال: Unity, Unreal Engine, C#'
+    },
+    cybersecurity: { 
+      job: 'مثل: محلل أمن سيبراني', 
+      skills: 'مثال: Penetration Testing, Firewalls, Encryption' 
+    },
+    ai: { 
+      job: 'مثل: مطور ذكاء اصطناعي', 
+      skills: 'مثال: Python, TensorFlow, NLP, Computer Vision' 
+    },
+    blockchain: { 
+      job: 'مثل: مطور بلوك تشين', 
+      skills: 'مثال: Solidity, Ethereum, Smart Contracts' 
+    },
+    data: { 
+      job: 'مثل: محلل بيانات أو عالم بيانات', 
+      skills: 'مثال: SQL, Power BI, Python, Machine Learning' 
+    },
+    qa: {
+      job: 'مثل: مختبر جودة برمجيات',
+      skills: 'مثال: Selenium, Unit Testing, Bug Tracking'
+    },
+    devops: {
+      job: 'مثل: مهندس DevOps',
+      skills: 'مثال: Docker, Kubernetes, CI/CD'
+    },
+    cloud: {
+      job: 'مثل: مهندس سحابة',
+      skills: 'مثال: AWS, Azure, Google Cloud'
+    },
+
+    // --- التصميم والإبداع ---
+    design: { 
+      job: 'مثل: مصمم جرافيك أو مونتير فيديو', 
+      skills: 'مثال: Photoshop, Illustrator, Premiere, After Effects' 
+    },
+    animation: { 
+      job: 'مثل: رسام أنيميشن أو موشن جرافيك', 
+      skills: 'مثال: Blender, Maya, After Effects' 
+    },
+    uiux: {
+      job: 'مثل: مصمم واجهات وتجربة مستخدم',
+      skills: 'مثال: Figma, Sketch, Wireframing, Prototyping'
+    },
+    photography: { 
+      job: 'مثل: مصور منتجات أو مناسبات', 
+      skills: 'مثال: Lightroom, Photoshop, تصوير احترافي' 
+    },
+    architecture: { 
+      job: 'مثل: مهندس معماري أو مصمم ديكور', 
+      skills: 'مثال: AutoCAD, Revit, 3ds Max' 
+    },
+    music: { 
+      job: 'مثل: ملحن أو منتج موسيقي', 
+      skills: 'مثال: FL Studio, Logic Pro, Mixing, Sound Design' 
+    },
+    voiceOver: {
+      job: 'مثل: مؤدي صوتي',
+      skills: 'مثال: تعليق إعلاني، دبلجة، كتب صوتية'
+    },
+
+    // --- التسويق والمبيعات ---
+    marketing: { 
+      job: 'مثل: مدير تسويق رقمي', 
+      skills: 'مثال: SEO, Google Ads, Facebook Ads' 
+    },
+    socialMedia: {
+      job: 'مثل: مدير حسابات سوشيال ميديا',
+      skills: 'مثال: إدارة حملات، إنشاء محتوى، تحليل أداء'
+    },
+    sales: { 
+      job: 'مثل: مسؤول مبيعات', 
+      skills: 'مثال: CRM, إغلاق صفقات، خدمة عملاء' 
+    },
+    pr: {
+      job: 'مثل: مسؤول علاقات عامة',
+      skills: 'مثال: كتابة بيانات صحفية، تنظيم فعاليات'
+    },
+    ecommerce: {
+      job: 'مثل: مدير متجر إلكتروني',
+      skills: 'مثال: Shopify, WooCommerce, إدارة منتجات'
+    },
+
+    // --- الكتابة والمحتوى ---
+    contentIndustry: { 
+      job: 'مثل: كاتب محتوى إبداعي', 
+      skills: 'مثال: مقالات، سيناريو، قصص، Copywriting' 
+    },
+    translation: { 
+      job: 'مثل: مترجم تحريري أو فوري', 
+      skills: 'مثال: ترجمة تقنية، أدبية، تدقيق لغوي' 
+    },
+    blogging: {
+      job: 'مثل: مدوّن',
+      skills: 'مثال: كتابة مقالات، SEO، إدارة مدونة'
+    },
+    technicalWriting: {
+      job: 'مثل: كاتب تقني',
+      skills: 'مثال: توثيق برامج، إعداد كتيبات، شروح تقنية'
+    },
+
+    // --- التعليم والتدريب ---
+    training: { 
+      job: 'مثل: مدرب عن بعد', 
+      skills: 'مثال: إعداد دورات، Webinars, دعم فني' 
+    },
+    education: { 
+      job: 'مثل: مدرس خصوصي', 
+      skills: 'مثال: تدريس لغات، رياضيات، علوم' 
+    },
+    coaching: {
+      job: 'مثل: مدرب تنمية بشرية',
+      skills: 'مثال: مهارات قيادية، تحفيز، تطوير شخصي'
+    },
+
+    // --- خدمات أخرى ---
+    customerSupport: { 
+      job: 'مثل: موظف خدمة عملاء', 
+      skills: 'مثال: دعم فني، الرد على استفسارات، إدارة شكاوى' 
+    },
+    logistics: { 
+      job: 'مثل: مسؤول لوجستيات', 
+      skills: 'مثال: إدارة مخزون، شحن، سلاسل إمداد' 
+    },
+    health: { 
+      job: 'مثل: أخصائي تغذية أو دعم صحي', 
+      skills: 'مثال: خطط غذائية، استشارات، متابعة مرضى' 
+    },
+    humanitarian: { 
+      job: 'مثل: مسؤول مشاريع إنسانية', 
+      skills: 'مثال: تنسيق، كتابة تقارير، إدارة فرق' 
+    },
+    other: { 
+      job: 'مثل: مقدم خدمات عامة', 
+      skills: 'مثال: خدمات متنوعة حسب الطلب' 
+    }
   };
 
   const currentPlaceholders = placeholderMap[specialty] || {};

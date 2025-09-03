@@ -126,7 +126,7 @@ const Navbar = () => {
                   تسجيل الدخول
                 </Link>
                 
-                <Link to="/signup" className="px-4 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white 
+                <Link to="/register" className="px-4 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white 
                   text-base duration-300 inline-block focus:outline-none focus:ring-2 focus:ring-cyan-500" tabIndex={0}>
                   اشترك الآن
                 </Link>
@@ -148,7 +148,7 @@ const Navbar = () => {
                       focus:outline-none focus:ring-2 focus:ring-cyan-500 rounded" tabIndex={0}>
                       تسجيل الدخول
                     </Link>
-                    <Link to="/signup" className="px-4 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white 
+                    <Link to="/register" className="px-4 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white 
                       text-base duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-500" tabIndex={0}>
                       اشترك الآن
                     </Link>
@@ -214,7 +214,7 @@ const Navbar = () => {
                 تسجيل الدخول
               </Link>
               
-              <Link to="/signup" onClick={closeNavbar} 
+              <Link to="/register" onClick={closeNavbar} 
                 className="block w-full text-center py-2 px-4 rounded-md bg-neutral-800 text-white">
                 اشترك الآن
               </Link>

@@ -161,7 +161,7 @@ const Login = () => {
 
           <p className="text-center text-sm text-gray-600 pt-4">
             ليس لديك حساب؟{' '}
-            <Link to="/signup" className="font-medium text-cyan-600 hover:underline">
+            <Link to="/register" className="font-medium text-cyan-600 hover:underline">
               أنشئ حساباً
             </Link>
           </p>

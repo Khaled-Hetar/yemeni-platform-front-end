@@ -182,7 +182,7 @@ const SignUp = () => {
             onChange={(e) => setAgreedToTerms(e.target.checked)}
             className="h-4 w-4 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500" />
             <label htmlFor="terms" className="mr-2 text-sm text-gray-700">
-              أقر بأنني قرأت ووافقت على
+              أقر بأنني قرأت ووافقت على 
               <Link to="/terms" className="text-cyan-600 hover:underline">
                 شروط الاستخدام</Link> و <Link to="/privacy" className="text-cyan-600 hover:underline">سياسة الخصوصية</Link>.
             </label>
