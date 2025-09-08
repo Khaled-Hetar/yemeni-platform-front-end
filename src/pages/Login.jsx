@@ -4,32 +4,54 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 import apiClient from '../api/axiosConfig';
 import { useAuth } from '../context/AuthContext';
+import GoogleLoginButton from '../components/auth/GoogleLoginButton';
+import Divider from '../components/auth/Divider';
+
+
+const InputField = ({ id, label, type, value, onChange, error, placeholder, children }) => (
+  <div>
+    <label htmlFor={id} className="block mb-2 font-medium text-gray-700">
+      {label}
+    </label>
+    <div className="relative">
+      <input
+        type={type}
+        id={id}
+        name={id}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        className={`w-full p-3 border rounded-lg outline-none transition duration-200 bg-gray-50
+           ${error ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500'}`}
+      />
+      {children}
+    </div>
+    {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+  </div>
+);
 
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
-  const [remember, setRemember] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const handleGoogleLogin = () => {
-    window.location.href = `${import.meta.env.VITE_API_URL}/auth/google/redirect`;
-  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    // إزالة الخطأ عند بدء الكتابة
+    if (errors[name] || errors.api) {
+      setErrors(prev => ({ ...prev, [name]: null, api: null }));
+    }
   };
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.email) {
+    if (!formData.email.trim()) {
       newErrors.email = 'البريد الإلكتروني مطلوب.';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'صيغة البريد الإلكتروني غير صحيحة.';
@@ -42,127 +64,103 @@ const Login = () => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  if (!validateForm()) return;
+    e.preventDefault();
+    if (!validateForm()) return;
 
-  setLoading(true);
-  setErrors({});
+    setLoading(true);
+    setErrors({});
 
-  try {
-    const response = await apiClient.post('/login', {
-      email: formData.email,
-      password: formData.password,
-    });
+    try {
+      // إرسال طلب POST إلى نقطة نهاية /login في Laravel
+      const response = await apiClient.post('/login', formData);
 
-    const { user, token } = response.data;
+      const { user, token } = response.data;
 
-    login(user, token);
-    navigate('/dashboard');
+      // استدعاء دالة login من AuthContext لحفظ بيانات المستخدم والتوكن
+      login(user, token);
 
-  } catch (error) {
-    if (error.response && error.response.status === 401) {
-      setErrors({ api: 'البريد الإلكتروني أو كلمة المرور غير صحيحة.' });
-    } else if (error.response && error.response.status === 422) {
-      setErrors({ api: 'البيانات المدخلة غير صحيحة.' });
-    } else {
-      setErrors({ api: 'حدث خطأ في الاتصال بالخادم. يرجى المحاولة مرة أخرى.' });
+      // توجيه المستخدم إلى لوحة التحكم أو الصفحة الرئيسية بعد تسجيل الدخول
+      navigate('/dashboard');
+
+    } catch (error) {
+      const errorMessage = error.response?.status === 401
+        ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة.'
+        : 'حدث خطأ ما. يرجى المحاولة مرة أخرى.';
+      setErrors({ api: errorMessage });
+      console.error("Login error:", error);
+    } finally {
+      setLoading(false);
     }
-    console.error("Login error:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
-        <h2 className="text-3xl font-semibold text-center mb-6">تسجيل الدخول</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <div className="w-full max-w-md bg-white mt-8 p-6 md:p-8 rounded-xl shadow-lg border border-gray-300">
+        <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900">أهلاً بك!</h2>
+            <p className="text-gray-500 mt-2">سجل دخولك للمتابعة إلى المنصة اليمنية.</p>
+        </div>
         
-        {/* زر الإشتراك عن طريق جوجل */}
-        <div className="flex items-center justify-center mb-6">
-          <button
-            onClick={handleGoogleLogin}
-            className="flex items-center justify-center gap-2 w-full max-w-xs 
-            bg-white border border-gray-300 p-2 rounded-2xl shadow 
-            hover:bg-gray-100 transition font-medium text-gray-800"
+        <GoogleLoginButton />
+
+        <Divider />
+
+        <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+          <InputField
+            id="email"
+            label="البريد الإلكتروني"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            error={errors.email}
+            placeholder="example@email.com"
+          />
+          
+          <InputField
+            id="password"
+            label="كلمة المرور"
+            type={showPassword ? "text" : "password"}
+            value={formData.password}
+            onChange={handleChange}
+            error={errors.password}
+            placeholder="********"
           >
-            <FcGoogle className="w-6 h-6" />
-            المتابعة باستخدام جوجل
-          </button>
-        </div>
-        <div className="flex items-center gap-4 my-6">
-          <hr className="flex-grow border-t border-gray-300" />
-          <span className="text-gray-500 text-sm">أو</span>
-          <hr className="flex-grow border-t border-gray-300" />
-        </div>
-
-        <form autoComplete="off" className="space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="email" className="block mb-1 font-medium text-gray-700">
-              البريد الإلكتروني
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="example@email.com"
-              value={formData.email}
-              onChange={handleChange}
-              className={`w-full p-3 border rounded-xl outline-none transition
-               ${errors.email ? 'border-red-500 ring-1 ring-red-500' :
-                'border-gray-300 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500'}`}
-            />
-            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
-          </div>
-
-          <div className="relative">
-            <label htmlFor="password" className="block mb-1 font-medium text-gray-700">كلمة المرور</label>
-            <input
-              type={showPassword ? "text" : "password"}
-              id="password"
-              name="password"
-              placeholder="********"
-              value={formData.password}
-              onChange={handleChange}
-              className={`w-full p-3 border rounded-xl outline-none transition ${errors.password ? 
-                'border-red-500 ring-1 ring-red-500' :
-                'border-gray-300 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500'}`}
-            />
-            <span onClick={() => setShowPassword(!showPassword)} className="absolute text-xl left-3 
-            top-10 text-gray-500 cursor-pointer select-none">
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
+            >
               {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </span>
-            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
-          </div>
+            </button>
+          </InputField>
 
           <div className="flex items-center justify-between text-sm">
-            <label htmlFor="remember" className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" id="remember" name='remember' checked={remember}
-                onChange={(e) => setRemember(e.target.checked)} className="rounded" />
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input type="checkbox" className="rounded border-gray-300 text-sky-600 focus:ring-sky-500" />
               تذكرني
             </label>
-            <Link to="/forgot-password" className="text-cyan-600 hover:underline">
+            <Link to="/forgot-password" className="font-medium text-sky-600 hover:underline">
               هل نسيت كلمة المرور؟
             </Link>
           </div>
 
           {errors.api && (
-            <div className="text-red-600 text-center text-sm font-medium p-2 bg-red-50 rounded-lg">{errors.api}</div>
+            <div className="text-red-600 text-center text-sm font-semibold p-3 bg-red-50 rounded-lg border border-red-200">{errors.api}</div>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full p-3 bg-sky-600 text-white rounded-xl text-lg font-medium 
-            hover:bg-sky-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full p-3 bg-sky-600 text-white rounded-lg text-base font-semibold hover:bg-sky-700 transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading ? 'جاري التحقق...' : 'تسجيل الدخول'}
           </button>
 
           <p className="text-center text-sm text-gray-600 pt-4">
             ليس لديك حساب؟{' '}
-            <Link to="/register" className="font-medium text-cyan-600 hover:underline">
-              أنشئ حساباً
+            <Link to="/register" className="font-semibold text-sky-600 hover:underline">
+              أنشئ حساباً جديداً
             </Link>
           </p>
         </form>

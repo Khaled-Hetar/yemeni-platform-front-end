@@ -1,8 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useNavigate, Link } from 'react-router-dom';
 import apiClient from '../api/axiosConfig';
 import { useAuth } from '../context/AuthContext';
+import PasswordStrengthMeter from '../components/auth/PasswordStrengthMeter';
+const InputField = ({ id, label, type, value, onChange, error, placeholder, children }) => (
+  <div>
+    <label htmlFor={id} className="block mb-2 font-medium text-gray-700">
+      {label}
+    </label>
+    <div className="relative">
+      <input
+        type={type}
+        id={id}
+        name={id}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        className={`w-full p-3 border rounded-lg outline-none transition duration-200 bg-gray-50
+           ${error ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500'}`}
+      />
+      {children}
+    </div>
+    {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+  </div>
+);
 
 
 const SignUp = () => {
@@ -14,45 +36,41 @@ const SignUp = () => {
     lastname: '',
     email: '',
     password: '',
-    confirmPassword: '',
+    password_confirmation: '', // مطابقة لاسم الحقل في Laravel
   });
 
-  
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState(0);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    if (errors[name] || errors.api) {
+      setErrors(prev => ({ ...prev, [name]: null, api: null }));
+    }
   };
-
-  const calculatePasswordStrength = (pass) => {
-    let score = 0;
-    if (!pass) return 0;
-    if (pass.length >= 8) score++;
-    if (pass.length >= 12) score++;
-    if (/[A-Z]/.test(pass) && /[a-z]/.test(pass)) score++;
-    if (/\d/.test(pass)) score++;
-    if (/[^A-Za-z0-9]/.test(pass)) score++;
-    return Math.min(score, 5);
-  };
-
-  useEffect(() => {
-    setPasswordStrength(calculatePasswordStrength(formData.password));
-  }, [formData.password]);
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.firstname) newErrors.firstname = 'الاسم الأول مطلوب.';
-    if (!formData.lastname) newErrors.lastname = 'الاسم الأخير مطلوب.';
-    if (!formData.email) newErrors.email = 'البريد الإلكتروني مطلوب.';
-    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'كلمتا المرور غير متطابقتين.';
-    if (formData.password.length < 8) newErrors.password = 'كلمة المرور يجب أن تكون 8 أحرف على الأقل.';
-    if (!agreedToTerms) newErrors.terms = 'يجب الموافقة على الشروط والأحكام للمتابعة.';
+    if (!formData.firstname.trim()) newErrors.firstname = 'الاسم الأول مطلوب.';
+    if (!formData.lastname.trim()) newErrors.lastname = 'الاسم الأخير مطلوب.';
+    if (!formData.email.trim()) {
+      newErrors.email = 'البريد الإلكتروني مطلوب.';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'صيغة البريد الإلكتروني غير صحيحة.';
+    }
+    if (formData.password.length < 8) {
+      newErrors.password = 'كلمة المرور يجب أن تكون 8 أحرف على الأقل.';
+    }
+    if (formData.password !== formData.password_confirmation) {
+      newErrors.password_confirmation = 'كلمتا المرور غير متطابقتين.';
+    }
+    if (!agreedToTerms) {
+      newErrors.terms = 'يجب الموافقة على الشروط والأحكام.';
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -65,139 +83,88 @@ const SignUp = () => {
     setErrors({});
 
     try {
-      const response = await apiClient.post('/register', {
-        firstname: formData.firstname,
-        lastname: formData.lastname,
-        email: formData.email,
-        password: formData.password,
-        password_confirmation: formData.confirmPassword,
-      });
-      
+      const response = await apiClient.post('/register', formData);
       const { user, token } = response.data;
 
+      // تسجيل دخول المستخدم الجديد فورًا
       login(user, token);
+
+      // توجيه المستخدم لإكمال ملفه الشخصي
       navigate('/account-type');
 
     } catch (error) {
-  if (error.response && error.response.status === 422) {
-      const validationErrors = error.response.data.errors;
-      const newErrors = {};
-      // تحويل أخطاء Laravel إلى شكل يمكن للواجهة عرضه
-      for (const key in validationErrors) {
-        // Laravel يرسل اسم الحقل كمفتاح، والخطأ كمصفوفة
-        newErrors[key] = validationErrors[key][0];
+      if (error.response && error.response.status === 422) {
+        // معالجة أخطاء التحقق من Laravel (Validation Errors)
+        const laravelErrors = error.response.data.errors;
+        const newErrors = {};
+        for (const key in laravelErrors) {
+          newErrors[key] = laravelErrors[key][0];
+        }
+        setErrors(newErrors);
+      } else {
+        setErrors({ api: 'حدث خطأ غير متوقع. قد يكون البريد الإلكتروني مستخدماً بالفعل.' });
       }
-      setErrors(newErrors);
-    } else {
-      // معالجة الأخطاء الأخرى
-      setErrors({ api: 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.' });
-    }
-    console.error("Signup Error:", error);
-  }
- finally {
+      console.error("Signup Error:", error);
+    } finally {
       setLoading(false);
     }
   };
 
-  const getStrengthInfo = () => {
-    switch (passwordStrength) {
-      case 1: return { color: 'bg-red-500', text: 'ضعيفة' };
-      case 2: return { color: 'bg-yellow-500', text: 'متوسطة' };
-      case 3: return { color: 'bg-blue-500', text: 'جيدة' };
-      case 4: return { color: 'bg-sky-500', text: 'قوية' };
-      case 5: return { color: 'bg-green-500', text: 'قوية جداً' };
-      default: return { color: 'bg-gray-300', text: '' };
-    }
-  };
-  const strengthInfo = getStrengthInfo();
-
   return (
-    <div className="max-w-md mx-auto bg-white p-6 rounded-xl shadow-md space-y-4 my-8">
-      <h2 className="text-2xl font-bold text-center text-cyan-700 mb-4">إنشاء حساب جديد</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="firstname" className="font-bold">الاسم الأول:</label>
-            <input type="text" id="firstname" name="firstname" placeholder="خالد"
-              required value={formData.firstname} onChange={handleChange}
-              className={`w-full p-2 mt-1 border-2 rounded-md outline-none 
-              ${errors.firstname ? 'border-red-500' : 'border-gray-300 focus:border-cyan-500'}`} />
-            {errors.firstname && <p className="text-red-500 text-sm mt-1">{errors.firstname}</p>}
-          </div>
-
-          <div>
-            <label htmlFor="lastname" className="font-bold">الاسم الأخير:</label>
-            <input type="text" id="lastname" name="lastname" placeholder="هتار"
-              required value={formData.lastname} onChange={handleChange}
-              className={`w-full p-2 mt-1 border-2 rounded-md outline-none 
-              ${errors.lastname ? 'border-red-500' : 'border-gray-300 focus:border-cyan-500'}`} />
-            {errors.lastname && <p className="text-red-500 text-sm mt-1">{errors.lastname}</p>}
-          </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <div className="w-full max-w-lg bg-white p-6 mt-20 md:p-8 rounded-xl shadow-lg border border-gray-300">
+        <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900">إنشاء حساب جديد</h2>
+            <p className="text-gray-500 mt-2">انضم إلى مجتمع المنصة اليمنية وابدأ رحلتك.</p>
         </div>
 
-        <div>
-          <label htmlFor="email" className="font-bold">البريد الإلكتروني:</label>
-          <input type="email" id="email" name="email" placeholder="example@gmail.com"
-            required value={formData.email} onChange={handleChange}
-            className={`w-full p-2 mt-1 border-2 rounded-md outline-none 
-            ${errors.email ? 'border-red-500' : 'border-gray-300 focus:border-cyan-500'}`} />
-          {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
-        </div>
-        
-        <div className="relative">
-          <label htmlFor="password" className="font-bold">كلمة المرور:</label>
-          <input type={showPassword ? 'text' : 'password'} id="password" name="password"
-            placeholder="********" required value={formData.password} onChange={handleChange}
-            className={`w-full p-2 mt-1 border-2 rounded-md outline-none ${errors.password ? 'border-red-500'
-              : 'border-gray-300'}`} />
-          <span onClick={() => setShowPassword(!showPassword)}
-            className="absolute left-3 top-[60%] -translate-y-1/2 text-xl text-gray-500 cursor-pointer"><FaEye /></span>
-          {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
-          {formData.password && (
-            <div className="space-y-1 mt-2">
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className={`h-2 rounded-full transition-all duration-300 ${strengthInfo.color}`}
-                  style={{ width: `${(passwordStrength / 5) * 100}%` }}>
-                </div>
-              </div>
-              <p className="text-xs text-right text-gray-500">{strengthInfo.text}</p>
+        <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <InputField id="firstname" label="الاسم الأول" type="text" value={formData.firstname} onChange={handleChange} error={errors.firstname} placeholder="خالد" />
+            <InputField id="lastname" label="الاسم الأخير" type="text" value={formData.lastname} onChange={handleChange} error={errors.lastname} placeholder="هتار" />
+          </div>
+          
+          <InputField id="email" label="البريد الإلكتروني" type="email" value={formData.email} onChange={handleChange} error={errors.email} placeholder="example@email.com" />
+          
+          <div>
+            <InputField id="password" label="كلمة المرور" type={showPassword ? "text" : "password"} value={formData.password} onChange={handleChange} error={errors.password} placeholder="********">
+              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </InputField>
+            {formData.password && <PasswordStrengthMeter password={formData.password} />}
+          </div>
+
+          <InputField id="password_confirmation" label="تأكيد كلمة المرور" type={showConfirmPassword ? "text" : "password"} value={formData.password_confirmation} onChange={handleChange} error={errors.password_confirmation} placeholder="********">
+            <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+              {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+            </button>
+          </InputField>
+
+          <div>
+            <div className="flex items-start gap-3">
+              <input type="checkbox" id="terms" checked={agreedToTerms} onChange={(e) => setAgreedToTerms(e.target.checked)} className="mt-1 h-4 w-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500" />
+              <label htmlFor="terms" className="text-sm text-gray-600">
+                أوافق على <Link to="/terms" className="font-medium text-sky-600 hover:underline">شروط الاستخدام</Link> و <Link to="/privacy" className="font-medium text-sky-600 hover:underline">سياسة الخصوصية</Link>.
+              </label>
             </div>
-          )}
-        </div>
-
-        <div className="relative">
-          <label htmlFor="confirmPassword" className="font-bold">تأكيد كلمة المرور:</label>
-          <input type={showConfirmPassword ? 'text' : 'password'}
-            id="confirmPassword" name="confirmPassword" placeholder="********" required
-            value={formData.confirmPassword} onChange={handleChange}
-            className={`w-full p-2 mt-1 border-2 rounded-md outline-none ${errors.confirmPassword
-              ? 'border-red-500' : 'border-gray-300'}`} />
-          <span onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            className="absolute left-3 top-[60%] -translate-y-1/2 text-xl text-gray-500 cursor-pointer"><FaEye /></span>
-          {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
-        </div>
-
-        <div className="space-y-1">
-          <div className="flex items-center"><input type="checkbox" id="terms" checked={agreedToTerms}
-            onChange={(e) => setAgreedToTerms(e.target.checked)}
-            className="h-4 w-4 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500" />
-            <label htmlFor="terms" className="mr-2 text-sm text-gray-700">
-              أقر بأنني قرأت ووافقت على 
-              <Link to="/terms" className="text-cyan-600 hover:underline">
-                شروط الاستخدام</Link> و <Link to="/privacy" className="text-cyan-600 hover:underline">سياسة الخصوصية</Link>.
-            </label>
+            {errors.terms && <p className="text-red-500 text-sm mt-1">{errors.terms}</p>}
           </div>
-          {errors.terms && <p className="text-red-500 text-sm">{errors.terms}</p>}
-        </div>
 
-        {errors.api && <p className="text-red-600 text-center font-semibold">{errors.api}</p>}
-        <button type="submit" disabled={loading}
-          className={`w-full p-3 bg-gradient-to-r from-blue-700 via-cyan-600 to-cyan-300 
-          text-white rounded-full text-lg font-medium transition ${loading ? 'opacity-50 cursor-not-allowed'
-              : 'hover:opacity-90'}`}>
-          {loading ? 'جارٍ المعالجة...' : 'إنشاء الحساب'}
-        </button>
-      </form>
+          {errors.api && <div className="text-red-600 text-center text-sm font-semibold p-3 bg-red-50 rounded-lg border border-red-200">{errors.api}</div>}
+
+          <button type="submit" disabled={loading} className="w-full p-3 bg-sky-600 text-white rounded-lg text-base font-semibold hover:bg-sky-700 transition-colors duration-200 disabled:opacity-60">
+            {loading ? 'جاري الإنشاء...' : 'إنشاء الحساب والمتابعة'}
+          </button>
+
+          <p className="text-center text-sm text-gray-600 pt-4">
+            لديك حساب بالفعل؟{' '}
+            <Link to="/login" className="font-semibold text-sky-600 hover:underline">
+              سجل الدخول من هنا
+            </Link>
+          </p>
+        </form>
+      </div>
     </div>
   );
 };

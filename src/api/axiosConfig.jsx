@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: import.meta.env.VITE_API_URL, // تأكد من أن هذا السطر موجود هكذا بالضبط
+  baseURL: 'http://localhost:3001',
+    // baseURL: import.meta.env.VITE_API_URL, // تأكد من أن هذا السطر موجود هكذا بالضبط
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',

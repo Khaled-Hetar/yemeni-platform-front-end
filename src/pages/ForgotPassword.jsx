@@ -1,6 +1,12 @@
-import React, { useState, useEffect } from 'react';
+// src/pages/ForgotPassword.jsx
+
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import apiClient from '../api/axiosConfig';
+
+// استيراد المكونات
+import ForgotPasswordForm from '../components/forgot-password/ForgotPasswordForm';
+import EmailSentMessage from '../components/forgot-password/EmailSentMessage';
 
 const ForgotPassword = () => {
   const [emailSent, setEmailSent] = useState(false);
@@ -9,18 +15,20 @@ const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const savedEmail = localStorage.getItem('forgotEmail');
-    if (savedEmail) {
-      setEmail(savedEmail);
-    }
+    // التحسين المنطقي: يمكن إزالة هذا الجزء إذا لم يكن ضروريًا
+    // حفظ البريد الإلكتروني في localStorage قد لا يكون أفضل ممارسة للخصوصية
+    // const savedEmail = localStorage.getItem('forgotEmail');
+    // if (savedEmail) {
+    //   setEmail(savedEmail);
+    // }
   }, []);
 
   const isValidEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
+    return re.test(String(email).toLowerCase());
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     setError('');
 
@@ -32,77 +40,38 @@ const ForgotPassword = () => {
     setLoading(true);
 
     try {
+      // Laravel يتوقع هذا المسار عادةً
       await apiClient.post('/forgot-password', { email });
       
-      localStorage.setItem('forgotEmail', email); 
+      // localStorage.setItem('forgotEmail', email); 
       setEmailSent(true);
 
     } catch (apiError) {
+      // الخادم يجب أن يعيد دائمًا استجابة ناجحة لمنع كشف البريد الإلكتروني
+      // لكن في حالة حدوث خطأ حقيقي في الخادم، نعرض رسالة عامة
       const message = apiError.response?.data?.message || 'حدث خطأ ما، يرجى المحاولة مرة أخرى.';
       setError(message);
     } finally {
       setLoading(false);
     }
-  };
+  }, [email]);
 
+  // ===============================================================
+  // قسم الـ JSX (تم الحفاظ عليه كما هو من تصميمك الأصلي 100%)
+  // ===============================================================
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
         {!emailSent ? (
-          <>
-            <div className="mb-6 text-center">
-              <h2 className="text-2xl font-bold text-cyan-700 mb-2">استعادة كلمة المرور</h2>
-              <p className="text-neutral-600 text-sm">
-                أدخل بريدك الإلكتروني المسجّل وسنرسل لك التعليمات.
-              </p>
-            </div>
-            <form className="space-y-5" onSubmit={handleSubmit}>
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-neutral-700 mb-1">
-                  البريد الإلكتروني
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  name="email"
-                  placeholder="example@email.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none 
-                  focus:border-cyan-500 placeholder-gray-400"
-                />
-              </div>
-
-              {error && (
-                <div className="text-red-600 text-sm text-center font-semibold">
-                  {error}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-2 bg-gradient-to-r from-blue-700 via-cyan-600 to-cyan-200 
-                text-white font-semibold rounded-full hover:opacity-90 transition duration-200 
-                disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? 'جارٍ الإرسال...' : 'إرسال التعليمات'}
-              </button>
-            </form>
-          </>
+          <ForgotPasswordForm 
+            email={email}
+            setEmail={setEmail}
+            onSubmit={handleSubmit}
+            error={error}
+            loading={loading}
+          />
         ) : (
-          <div className="text-center">
-            <h2 className="text-xl font-bold text-green-600 mb-3">✅ تم إرسال التعليمات</h2>
-            <p className="text-neutral-700">
-                إذا كان البريد الإلكتروني
-                <strong className="font-semibold">{email}</strong>
-                مسجلاً لدينا، فستصلك رسالة تحتوي على رابط لإعادة تعيين كلمة المرور خلال الدقائق القادمة.
-            </p>
-            <p className="text-sm text-neutral-500 mt-4">
-              (يرجى التحقق من مجلد الرسائل غير المرغوب فيها Spam)
-            </p>
-          </div>
+          <EmailSentMessage email={email} />
         )}
 
         <div className="mt-6 text-center">

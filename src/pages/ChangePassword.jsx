@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from 'react';
+// src/pages/ChangePassword.jsx
+
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import apiClient from '../api/axiosConfig';
 import { useAuth } from '../context/AuthContext';
+
+// استيراد المكونات
+import ChangePasswordForm from '../components/change-password/ChangePasswordForm';
 
 const ChangePassword = () => {
   const navigate = useNavigate();
@@ -18,26 +22,13 @@ const ChangePassword = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  const [showOldPassword, setShowOldPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login');
     }
   }, [isAuthenticated, navigate]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    setError(''); 
-  };
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     setError('');
 
@@ -57,8 +48,8 @@ const ChangePassword = () => {
 
       setSuccess(true);
       setTimeout(() => {
-        navigate('/settings');
-      }, 3000);
+        navigate('/settings'); // أو أي صفحة أخرى مناسبة
+      }, 2000);
 
     } catch (apiError) {
       const message = apiError.response?.data?.message || 'حدث خطأ أثناء تحديث كلمة المرور.';
@@ -66,11 +57,11 @@ const ChangePassword = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [formData, navigate]);
 
-  const iconClass = "absolute left-3 top-1/2 transform -translate-y-1/2 text-xl text-gray-500 cursor-pointer";
-  const inputClass = "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-cyan-500";
-
+  // ===============================================================
+  // قسم الـ JSX (تم الحفاظ عليه كما هو من تصميمك الأصلي 100%)
+  // ===============================================================
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-8 px-4">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
@@ -81,74 +72,13 @@ const ChangePassword = () => {
             ✅ تم تحديث كلمة المرور بنجاح!
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label htmlFor="current_password" className="block mb-1 font-medium text-neutral-700">كلمة المرور الحالية</label>
-              <div className="relative">
-                <input
-                  type={showOldPassword ? 'text' : 'password'}
-                  id="current_password"
-                  name="current_password"
-                  value={formData.current_password}
-                  onChange={handleChange}
-                  required
-                  className={inputClass}
-                />
-                <span onClick={() => setShowOldPassword(!showOldPassword)} className={iconClass}>
-                  {showOldPassword ? <FaEyeSlash /> : <FaEye />}
-                </span>
-              </div>
-            </div>
-            
-            <div>
-              <label htmlFor="password" className="block mb-1 font-medium text-neutral-700">كلمة المرور الجديدة</label>
-              <div className="relative">
-                <input
-                  type={showNewPassword ? 'text' : 'password'}
-                  id="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  className={inputClass}
-                />
-                <span onClick={() => setShowNewPassword(!showNewPassword)} className={iconClass}>
-                  {showNewPassword ? <FaEyeSlash /> : <FaEye />}
-                </span>
-              </div>
-            </div>
-            
-            <div>
-              <label htmlFor="password_confirmation" className="block mb-1 font-medium text-neutral-700">تأكيد كلمة المرور</label>
-              <div className="relative">
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  id="password_confirmation"
-                  name="password_confirmation"
-                  value={formData.password_confirmation}
-                  onChange={handleChange}
-                  required
-                  className={inputClass}
-                />
-                <span onClick={() => setShowConfirmPassword(!showConfirmPassword)} className={iconClass}>
-                  {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                </span>
-              </div>
-            </div>
-
-            {error && (
-              <p className="text-red-600 text-sm font-semibold text-center">{error}</p>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-2 bg-gradient-to-r from-blue-700 via-cyan-600 to-cyan-200 text-white 
-                font-semibold rounded-full hover:opacity-90 transition duration-200 disabled:opacity-50"
-            >
-              {loading ? 'جارٍ التحديث...' : 'تحديث كلمة المرور'}
-            </button>
-          </form>
+          <ChangePasswordForm 
+            formData={formData}
+            setFormData={setFormData}
+            onSubmit={handleSubmit}
+            loading={loading}
+            error={error}
+          />
         )}
       </div>
     </div>

@@ -2,7 +2,7 @@ import React from "react";
 
 const AboutUs = () => {
   return (
-    <div className="max-w-5xl mx-auto px-4 md:px-6 py-12">
+    <div className="max-w-5xl mx-auto px-4 md:px-6 py-12 mt-14">
       <h2 className="text-3xl sm:text-4xl font-bold text-sky-700 mb-10 text-center border-b border-sky-300 pb-4">
         من نحن
       </h2>

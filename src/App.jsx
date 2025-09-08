@@ -3,9 +3,9 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 
 // --- المكونات الأساسية ---
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import ProtectedRoute from './pages/ProtectedRoute'; // <-- المكون الحارس
+import Navbar from './components/layout/Navbar';
+import Footer from './components/layout/Footer';
+import ProtectedRoute from './pages/ProtectedRoute';
 
 // --- الصفحات العامة (يمكن لأي شخص الوصول إليها) ---
 import Home from './pages/Home';
@@ -16,7 +16,7 @@ import ResetPassword from './pages/ResetPassword';
 import ServicesPage from './pages/ServicesPage';
 import ServiceDetails from "./pages/ServiceDetails";
 
-import Projects from './pages/Projects'; // صفحة عرض المشاريع العامة
+import ProjectsPage from './pages/ProjectsPage'; // صفحة عرض المشاريع العامة
 import ProjectDetailsPage from './pages/ProjectDetailsPage'; // تفاصيل مشروع عام
 import UserProfile from './pages/UserProfile'; // صفحة الملف الشخصي عامة
 import ContactUs from './pages/ConcateUs';
@@ -71,7 +71,7 @@ const App = () => {
             {/* صفحات التصفح العامة */}
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/services/:id" element={<ServiceDetails />} />
-            <Route path="/projects" element={<Projects />} />
+            <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/projects/:id" element={<ProjectDetailsPage />} />
             <Route path="/profile/:userId" element={<UserProfile />} />
 
@@ -84,9 +84,9 @@ const App = () => {
             <Route path="/termsof-service" element={<TermsofService />} />
 
             {/* ===================   2. المسارات المحمية   ==================== */}
-            <Route element={<ProtectedRoute />}>
+            {/* <Route element={<ProtectedRoute />}> */}
               {/* مسارات مشتركة بين كل المستخدمين المسجلين */}
-              <Route path="/dashboard" element={<Dashboard />} />
+              {/* <Route path="/dashboard" element={<Dashboard />} /> */}
               <Route path="/account-type" element={<AccountTypePage />} />
               <Route path="/email-verification" element={<EmailVerification />} />
               <Route path="/edit-profile" element={<EditUserProfile />} />
@@ -109,7 +109,7 @@ const App = () => {
               <Route path="/submit-proposal/:projectId" element={<SubmitProposalPage />} />
               <Route path="/projects/:projectId/review" element={<SubmitReviewPage />} />
               <Route path="/checkout/:serviceId" element={<Checkout />} />
-            </Route>
+            {/* </Route> */}
 
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
